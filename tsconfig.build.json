@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "allowImportingTsExtensions": false,
+    "types": ["node"]
+  },
+  "include": ["src/terminal.ts", "src/node.ts"]
+}

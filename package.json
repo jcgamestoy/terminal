@@ -1,6 +1,6 @@
 {
   "name": "@retrovm/terminal",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Fluent ANSI terminal library — 24-bit color, cursor control and screen management for Bun and Node.js",
   "author": "Juan Carlos González Amestoy",
   "license": "MIT",
@@ -20,23 +20,37 @@
   },
   "type": "module",
   "module": "src/terminal.ts",
+  "scripts": {
+    "build": "bun build src/terminal.ts src/node.ts --outdir dist --target node && tsc -p tsconfig.build.json",
+    "prepublishOnly": "bun run build"
+  },
   "exports": {
     ".": {
-      "bun":    "./src/bun.ts",
-      "types":  "./src/bun.ts",
-      "import": "./src/terminal.ts"
+      "bun":  "./src/bun.ts",
+      "node": {
+        "types":   "./dist/node.d.ts",
+        "default": "./dist/node.js"
+      },
+      "types":  "./dist/node.d.ts",
+      "import": "./dist/terminal.js"
     }
   },
   "files": [
-    "src"
+    "src",
+    "dist"
   ],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/node": "^25.8.0",
+    "typescript": "^5"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
     "@retrovm/color": "^0.1.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

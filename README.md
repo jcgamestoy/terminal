@@ -38,13 +38,21 @@ term.red('Hello ').bgBlue(' world ').reset().println()
 
 `Terminal.out` and `Terminal.err` are ready-made instances wired to `Bun.stdout` and `Bun.stderr`. Both are `ITerminal | undefined` — use `Terminal.out!` if you know stdout is available.
 
-### Any runtime (Node.js, xterm.js, custom)
+### Node.js
+
+```typescript
+import { Terminal } from '@retrovm/terminal'
+
+const term = Terminal.out   // pre-wired to process.stdout
+term.red('Hello ').bgBlue(' world ').reset().println()
+```
+
+`Terminal.out` and `Terminal.err` are pre-wired to `process.stdout` and `process.stderr` via the `"node"` export condition — no configuration needed.
+
+### Any sink (xterm.js, custom, test)
 
 ```typescript
 import { createTerminal } from '@retrovm/terminal'
-
-// Node.js writable
-const term = createTerminal(process.stdout)
 
 // xterm.js
 import { Terminal as XTerm } from '@xterm/xterm'
@@ -266,21 +274,35 @@ Named shortcuts (`term.red`, `term.bgBlue`, …) are built from the static `Colo
 {
   "exports": {
     ".": {
-      "bun":    "./src/bun.ts",
-      "types":  "./src/bun.ts",
-      "import": "./src/terminal.ts"
+      "bun":  "./src/bun.ts",
+      "node": { "types": "./dist/node.d.ts", "default": "./dist/node.js" },
+      "types": "./dist/node.d.ts",
+      "import": "./dist/terminal.js"
     }
   }
 }
 ```
 
-| Condition | File | Used by |
+| Condition | Resolved to | Used by |
 |---|---|---|
-| `bun` | `src/bun.ts` | Bun runtime — exports pre-wired `Terminal.out` / `Terminal.err` plus re-exports everything from `terminal.ts` |
-| `types` | `src/bun.ts` | TypeScript language server (VSCode, tsc) |
-| `import` | `src/terminal.ts` | Node.js ESM, bundlers |
+| `bun` | `src/bun.ts` | Bun runtime — TS source, `Terminal.out/err` via `Bun.stdout/stderr` |
+| `node` | `dist/node.js` + `dist/node.d.ts` | Node.js — `Terminal.out/err` via `process.stdout/stderr` |
+| `types` | `dist/node.d.ts` | TypeScript language server (VSCode, tsc) in other environments |
+| `import` | `dist/terminal.js` | Bundlers, ESM environments without a specific condition |
 
-When running under Bun, `import { Terminal } from '@retrovm/terminal'` resolves to `src/bun.ts`. In Node.js it resolves to `src/terminal.ts`, which exports `createTerminal` and the `Terminal` class directly.
+## Building
+
+The package distributes TypeScript source for Bun and compiled output for Node.js. To build:
+
+```sh
+bun run build
+```
+
+This runs two steps:
+1. **`bun build`** — compiles `terminal.ts` and `node.ts` to `dist/` targeting Node.js
+2. **`tsc`** — generates `dist/terminal.d.ts` and `dist/node.d.ts` via `tsconfig.build.json`
+
+`prepublishOnly` runs the build automatically before `bun publish` / `npm publish`.
 
 ---
 
@@ -364,4 +386,26 @@ NO_COLOR=1 bun run sample/rainbow.ts   # plain text, no color
 
 ## License
 
-MIT © Juan Carlos González Amestoy
+```
+MIT License
+
+Copyright (c) 2026 Juan Carlos González Amestoy
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
