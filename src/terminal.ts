@@ -62,6 +62,8 @@ class TerminalCore {
   /** ANSI is suppressed when true; styling/cursor methods become no-ops. */
   public plain: boolean
 
+  private _altScreen = false;
+
   // Allows the auto-attached color methods to typecheck on `this`.
   [key: string]: unknown
 
@@ -212,7 +214,10 @@ class TerminalCore {
 
   /** Enables or disables the alternate screen buffer. */
   alt(b: boolean = true): this {
-    this.emit(`\x1b[?1049${b ? 'h' : 'l'}`)
+    if (b !== this._altScreen) {
+      this.emit(`\x1b[?1049${b ? 'h' : 'l'}`)
+      this._altScreen = b
+    }
     return this
   }
 
