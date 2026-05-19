@@ -1,6 +1,6 @@
 {
   "name": "@retrovm/terminal",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Fluent ANSI terminal library — 24-bit color, cursor control and screen management for Bun and Node.js",
   "author": "Juan Carlos González Amestoy",
   "license": "MIT",

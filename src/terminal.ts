@@ -116,9 +116,29 @@ class TerminalCore {
     return this.style(color.toAnsiBackgroundRGB(), fmt, args)
   }
 
-  /** Resets all attributes (color, background, intensity, …). */
-  reset(fmt: string = '', ...args: unknown[]): this {
+  /**
+   * Resets all text attributes (color, background, bold, dim, italic,
+   * underline, blink, reverse, …) by emitting `\x1b[0m`.
+   *
+   * Unlike {@link reset}, this does **not** touch the cursor visibility
+   * or the alternate screen buffer.
+   */
+  resetText(fmt: string = '', ...args: unknown[]): this {
     return this.style('\x1b[0m', fmt, args)
+  }
+
+  /**
+   * Fully resets the terminal to a clean state.
+   *
+   * In order:
+   * 1. Shows the cursor (`cursor(true)`)
+   * 2. Exits the alternate screen buffer (`alt(false)`)
+   * 3. Resets all text attributes — color, background, intensity, etc. (`\x1b[0m`)
+   *
+   * Safe to call as a teardown step after any TUI or interactive session.
+   */
+  reset(fmt: string = '', ...args: unknown[]): this {
+    return this.cursor(true).alt(false).style('\x1b[0m', fmt, args)
   }
 
   /** Resets only the foreground color. */
