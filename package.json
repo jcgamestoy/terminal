@@ -1,9 +1,36 @@
 {
   "name": "@retrovm/terminal",
-  "version": "0.2.0",
-  "description": "Fluent ANSI terminal library — 24-bit color, cursor control and screen management for Bun and Node.js",
+  "version": "0.2.1",
   "author": "Juan Carlos González Amestoy",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/retrovm/terminal.git"
+  },
+  "module": "src/terminal.ts",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^25.9.1",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "exports": {
+    ".": {
+      "bun": "./src/bun.ts",
+      "node": {
+        "types": "./dist/node.d.ts",
+        "default": "./dist/node.js"
+      },
+      "types": "./dist/node.d.ts",
+      "import": "./dist/terminal.js"
+    }
+  },
+  "description": "Fluent ANSI terminal library — 24-bit color, cursor control and screen management for Bun and Node.js",
+  "files": [
+    "src",
+    "dist"
+  ],
   "keywords": [
     "terminal",
     "ansi",
@@ -14,43 +41,16 @@
     "bun",
     "fluent"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/retrovm/terminal.git"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
   },
-  "type": "module",
-  "module": "src/terminal.ts",
   "scripts": {
     "build": "bun build src/terminal.ts src/node.ts --outdir dist --target node && tsc -p tsconfig.build.json",
     "prepublishOnly": "bun run build"
   },
-  "exports": {
-    ".": {
-      "bun":  "./src/bun.ts",
-      "node": {
-        "types":   "./dist/node.d.ts",
-        "default": "./dist/node.js"
-      },
-      "types":  "./dist/node.d.ts",
-      "import": "./dist/terminal.js"
-    }
-  },
-  "files": [
-    "src",
-    "dist"
-  ],
-  "devDependencies": {
-    "@types/bun": "latest",
-    "@types/node": "^25.8.0",
-    "typescript": "^5"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
+  "type": "module",
   "dependencies": {
-    "@retrovm/color": "^0.1.1"
-  },
-  "publishConfig": {
-    "access": "public"
+    "@retrovm/color": "^0.2.2"
   }
 }

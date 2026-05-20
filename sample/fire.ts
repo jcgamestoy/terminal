@@ -1,4 +1,5 @@
 import { Terminal } from '@retrovm/terminal'
+import { Color } from '@retrovm/color'
 const out = Terminal.out!
 
 const W = process.stdout.columns || 80
@@ -8,15 +9,15 @@ const FW = W, FH = H * 2
 const buf  = new Uint8Array(FW * (FH + 4))
 const prev = new Uint8Array(W * H * 2)
 
-// LUT: "r;g;b" precomputado para cada intensidad
-const pal: string[] = new Array(256)
+// LUT: Color precomputado para cada intensidad
+const pal: Color[] = new Array(256)
 for (let v = 0; v < 256; v++) {
   let r = 0, g = 0, b = 0
   if (v < 64)       { r = (v / 63 * 180) | 0 }
   else if (v < 128) { const t = (v - 64)  / 63; r = 180 + (t * 75)  | 0; g = (t * 100) | 0 }
   else if (v < 192) { const t = (v - 128) / 63; r = 255; g = 100 + (t * 155) | 0 }
   else              { const t = (v - 192) / 63; r = 255; g = 255; b = (t * 255) | 0 }
-  pal[v] = `${r};${g};${b}`
+  pal[v] = new Color(r / 255, g / 255, b / 255)
 }
 
 function seed() {
@@ -61,25 +62,25 @@ function frame() {
         prev[idx] = top; prev[idx + 1] = bot
 
         if (row !== lastRow || col !== lastCol + 1) {
-          out.raw(`\x1b[${row + 1};${col + 1}H`)
+          out.moveTo(row + 1, col + 1)
         }
 
         const bgChanged = top !== curBg
         const fgChanged = bot !== curFg
         if (bgChanged && fgChanged) {
-          out.raw(`\x1b[48;2;${pal[top]};38;2;${pal[bot]}m`)
+          out.paper(pal[top]!).ink(pal[bot]!)
           curBg = top; curFg = bot
         } else if (bgChanged) {
-          out.raw(`\x1b[48;2;${pal[top]}m`); curBg = top
+          out.paper(pal[top]!); curBg = top
         } else if (fgChanged) {
-          out.raw(`\x1b[38;2;${pal[bot]}m`); curFg = bot
+          out.ink(pal[bot]!); curFg = bot
         }
 
-        out.raw('▄')
+        out.print('▄')
         lastRow = row; lastCol = col
       }
     }
-    out.raw('\x1b[0m')
+    out.resetText()
   })
 
   firstFrame = false
