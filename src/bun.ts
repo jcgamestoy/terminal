@@ -21,20 +21,13 @@ SOFTWARE.*/
 import { createTerminal } from "./terminal"
 export { createTerminal, type ITerminal, type ITerminalWriter } from "./terminal"
 
-const  _writeOut=(data:string)=>{
-    const w=Bun.stdout.writer()
-    w.write(data)
-    w.flush()
-  }
+const _outWriter = Bun.stdout.writer()
+const _errWriter = Bun.stderr.writer()
 
-const  _writeErr=(data:string)=>{
-    const w=Bun.stderr.writer()
-    w.write(data)
-    w.flush()
-  }
+const _writeOut = (data: string) => { _outWriter.write(data); _outWriter.flush() }
+const _writeErr = (data: string) => { _errWriter.write(data); _errWriter.flush() }
 
-
-export const Terminal={
-  out: createTerminal({ write: _writeOut }) ,
-  err: createTerminal({ write: _writeErr }) ,
+export const Terminal = {
+  out: createTerminal({ write: _writeOut }),
+  err: createTerminal({ write: _writeErr }),
 }
